@@ -5,6 +5,7 @@
 //  Created by Wang, Michael on 12/7/25.
 //
 
+import SwiftUI
 import Foundation
 
 enum Operator : String, Hashable{
@@ -46,39 +47,40 @@ enum EvaluationError : Error {
     case DivisionByZero(Double)
 }
 
+final class Scanner {
+    private let tokens: [Token]
+    private var currentTokenIndex: Int
+    
+    init(tokens: [Token]) {
+        self.tokens = tokens
+        self.currentTokenIndex = 0
+    }
+    
+    func scan() -> Token? {
+        if currentTokenIndex >= tokens.count {
+            return nil
+        }
+        defer {
+            currentTokenIndex += 1
+        }
+        return tokens[currentTokenIndex]
+    }
+    
+    public var currentToken: Token? {
+        if currentTokenIndex >= tokens.count {
+            return nil
+        }
+        return tokens[currentTokenIndex]
+    }
+}
+
+struct HistoryEntry {
+    public let inputTokens: [Token]
+    public let result: Double
+}
+
+@Observable
 final class Evaluator {
-    public struct HistoryEntry {
-        public let inputTokens: [Token]
-        public let result: Double
-    }
-    
-    final class Scanner {
-        private let tokens: [Token]
-        private var currentTokenIndex: Int
-        
-        init(tokens: [Token]) {
-            self.tokens = tokens
-            self.currentTokenIndex = 0
-        }
-        
-        func scan() -> Token? {
-            if currentTokenIndex >= tokens.count {
-                return nil
-            }
-            defer {
-                currentTokenIndex += 1
-            }
-            return tokens[currentTokenIndex]
-        }
-        
-        public var currentToken: Token? {
-            if currentTokenIndex >= tokens.count {
-                return nil
-            }
-            return tokens[currentTokenIndex]
-        }
-    }
-    
     public var history: [HistoryEntry] = []
     
     private let operatorEvaluators: [Operator: (Double, Double) throws -> Double] = [
@@ -126,6 +128,7 @@ final class Evaluator {
                 guard operatorType.precedence >= minPrecedence else {
                     return lhs
                 }
+                _ = scanner.scan()
                 
                 let rhs = try evaluateExpression(minPrecedence: operatorType.precedence)
                 

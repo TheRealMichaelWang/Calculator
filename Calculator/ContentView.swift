@@ -42,6 +42,8 @@ struct ContentView: View {
     @State private var inputTokens: [Token] = []
     @State private var numberString: String = ""
     
+    @State private var evaluator: Evaluator = Evaluator()
+    
     // 1. Define the layout as a single 2D array (Rows containing Columns)
     // This allows us to mix numbers and operators in the same row easily.
     private let buttons: [[CalculatorButton]] = [
@@ -71,7 +73,7 @@ struct ContentView: View {
                 let stringTokens = inputTokens.map(\.asString)
                 // Step 2: Join the array
                 let finalString = stringTokens.joined(separator: " ")
-                return finalString + numberString
+                return finalString + " " + numberString
             },
             set: { _ in }
         )
@@ -142,8 +144,13 @@ struct ContentView: View {
             finalizeToken()
             
             //evaluate expression with input tokens
-            
-            inputTokens = []
+            do {
+                let result = try evaluator.evaluate(tokens: inputTokens)
+                inputTokens = [.NumberToken(result)]
+            }
+            catch {
+                inputTokens = []
+            }
         }
     }
 }

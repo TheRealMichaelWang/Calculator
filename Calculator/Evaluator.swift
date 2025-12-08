@@ -8,7 +8,7 @@
 import SwiftUI
 import Foundation
 
-enum Operator : String, Hashable{
+public enum Operator : String, Hashable{
     case Add = "+"
     case Subtract = "-"
     case Multiply = "*"
@@ -24,7 +24,7 @@ enum Operator : String, Hashable{
     }
 }
 
-enum Token : Hashable {
+public enum Token : Hashable {
     case NumberToken(Double)
     case OperatorToken(Operator)
     case OpenParenthesis
@@ -50,7 +50,7 @@ enum EvaluationError : Error {
     case NoAnswerAvailable
 }
 
-final class Scanner {
+public final class Scanner {
     private let tokens: [Token]
     private var currentTokenIndex: Int
     
@@ -77,14 +77,18 @@ final class Scanner {
     }
 }
 
-struct HistoryEntry {
+public struct HistoryEntry {
     public let inputTokens: [Token]
     public let result: Double
 }
 
 @Observable
-final class Evaluator {
-    public var history: [HistoryEntry] = []
+public final class Evaluator {
+    public var history: [HistoryEntry]
+    
+    public init(existingHistory: [HistoryEntry] = []) {
+        self.history = existingHistory
+    }
     
     private let operatorEvaluators: [Operator: (Double, Double) throws -> Double] = [
         .Add: (+),

@@ -103,6 +103,11 @@ final class Evaluator {
         let scanner = Scanner(tokens: tokens)
         
         func evaluateValue() throws -> Double {
+            MetricLogger.shared.start(name: "evaluateValue")
+            defer {
+                MetricLogger.shared.stop(name: "evaluateValue")
+            }
+            
             guard let token = scanner.scan() else {
                 throw EvaluationError.UnexpectedToken(nil)
             }
@@ -144,6 +149,11 @@ final class Evaluator {
                 lhs = try operatorEvaluators[operatorType]!(lhs, rhs)
             }
             return lhs
+        }
+        
+        MetricLogger.shared.start(name: "evaluate")
+        defer {
+            MetricLogger.shared.stop(name: "evaluate")
         }
         
         let answer = try evaluateExpression()

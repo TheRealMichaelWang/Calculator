@@ -9,6 +9,10 @@ import SwiftUI
 
 @main
 struct CalculatorApp: App {
+    init() {
+        AppMetrics.shared.receiveReports()
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

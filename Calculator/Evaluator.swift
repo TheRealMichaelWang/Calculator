@@ -29,6 +29,7 @@ enum Token : Hashable {
     case OperatorToken(Operator)
     case OpenParenthesis
     case CloseParenthesis
+    case Answer
     
     public var asString: String {
         switch self {
@@ -38,6 +39,7 @@ enum Token : Hashable {
             return op.rawValue
         case .OpenParenthesis: return "("
         case .CloseParenthesis: return ")"
+        case .Answer: return "Ans"
         }
     }
 }
@@ -45,6 +47,7 @@ enum Token : Hashable {
 enum EvaluationError : Error {
     case UnexpectedToken(Token?)
     case DivisionByZero(Double)
+    case NoAnswerAvailable
 }
 
 final class Scanner {
@@ -108,7 +111,7 @@ final class Evaluator {
             case .OpenParenthesis:
                 let innerExpr = try evaluateExpression()
          
-                guard scanner.currentToken != .CloseParenthesis else {
+                guard scanner.currentToken == .CloseParenthesis else {
                     throw EvaluationError.UnexpectedToken(scanner.currentToken)
                 }
                 
@@ -116,6 +119,12 @@ final class Evaluator {
                 return innerExpr
             case .NumberToken(let number):
                 return number
+            case .Answer:
+                guard let lastResult = history.last?.result else {
+                    throw EvaluationError.NoAnswerAvailable
+                }
+                
+                return lastResult
             default:
                 throw EvaluationError.UnexpectedToken(token)
             }

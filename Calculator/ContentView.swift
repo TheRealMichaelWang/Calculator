@@ -30,6 +30,8 @@ enum CalculatorButton : Hashable {
         switch self {
         case .TokenButton(.OperatorToken(_)):
             return .orange
+        case .TokenButton(_):
+            return Color(UIColor.gray)
         case .EnterButton, .ClearButton:
             return Color(UIColor.lightGray)
         default:
@@ -47,6 +49,13 @@ struct ContentView: View {
     // 1. Define the layout as a single 2D array (Rows containing Columns)
     // This allows us to mix numbers and operators in the same row easily.
     private let buttons: [[CalculatorButton]] = [
+        
+        [
+            .TokenButton(.OpenParenthesis),
+            .TokenButton(.CloseParenthesis),
+            .TokenButton(.Answer),
+            .ClearButton
+        ],
         [
             .DigitButton(7), .DigitButton(8), .DigitButton(9),
             .TokenButton(.OperatorToken(.Divide))
@@ -62,8 +71,7 @@ struct ContentView: View {
         [
             .DigitButton(0), .DecimalButton, .EnterButton,
             .TokenButton(.OperatorToken(.Add)) // Changed divide to add
-        ],
-        [.ClearButton] // Add a dedicated clear button
+        ]
     ]
     
     private var displayString: Binding<String> {
@@ -90,6 +98,7 @@ struct ContentView: View {
                 .padding()
                 .foregroundColor(.white)
                 .background(Color.black) // Calculator display style
+                .disabled(true)
             
             // 4. The Loop
             // We loop through the rows...
@@ -136,7 +145,7 @@ struct ContentView: View {
             }
         case .ClearButton:
             numberString = ""
-            inputTokens = []
+            inputTokens = [] 
         case .TokenButton(let token):
             finalizeToken()
             inputTokens.append(token)
